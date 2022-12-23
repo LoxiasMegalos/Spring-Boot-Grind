@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import med.voll.api.endereco.DadosAtualizaEndereco;
 import med.voll.api.endereco.DadosEndereco;
 
 public record DadosAtualizarMedico(
@@ -16,6 +17,6 @@ public record DadosAtualizarMedico(
         String telefone,
 
         @Valid //outro DTO que também deve ser validado!
-        DadosEndereco endereco
+        DadosAtualizaEndereco endereco
 ) {
 }

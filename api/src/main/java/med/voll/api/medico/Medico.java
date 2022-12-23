@@ -51,9 +51,9 @@ public class Medico {
     public void atualizarInformacoes(DadosAtualizarMedico dados) {
         if(dados.nome() != null)
             this.nome = dados.nome();
-        else if(dados.telefone() != null)
+        if(dados.telefone() != null)
             this.telefone = dados.telefone();
-        else if (dados.endereco() != null) {
+        if (dados.endereco() != null) {
             this.endereco.atualizarInformacoes(dados.endereco());
         }
     }

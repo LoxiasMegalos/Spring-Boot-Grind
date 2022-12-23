@@ -37,13 +37,14 @@ public class Conta {
     @OneToMany(mappedBy="creditedAccount")
     private List<Transacoes> credited;
 
-    public String atualizaConta(DepositoDTO dadosDeposito) {
+    public String atualizaConta(DepositoDTO dadosDeposito) throws Exception {
 
         if(dadosDeposito.valor() > 0){
             this.balance += dadosDeposito.valor();
             return "Depósito realizado com sucesso";
         }
-        return "Valor inválido";
+
+        throw new Exception("Quantia Inválida");
     }
 
     public void atualizaBalance(Double valor) {

@@ -30,20 +30,20 @@ public class Endereco {
         this.numero = endereco.numero();
     }
 
-    public void atualizarInformacoes(DadosEndereco dados) {
+    public void atualizarInformacoes(DadosAtualizaEndereco dados) {
         if(dados.logradouro() != null){
             this.logradouro = dados.logradouro();
-        } else if(dados.bairro() != null){
+        }if(dados.bairro() != null){
             this.bairro = dados.bairro();
-        }else if(dados.cep() != null){
+        }if(dados.cep() != null){
             this.cep = dados.cep();
-        }else if(dados.uf() != null){
+        }if(dados.uf() != null){
             this.uf = dados.uf();
-        }else if(dados.cidade() != null){
+        }if(dados.cidade() != null){
             this.cidade = dados.cidade();
-        }else if(dados.complemento() != null){
+        }if(dados.complemento() != null){
             this.complemento = dados.complemento();
-        }else {
+        }if(dados.numero() != null) {
             this.numero = dados.numero();
         }
     }

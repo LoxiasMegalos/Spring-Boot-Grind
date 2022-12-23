@@ -4,13 +4,16 @@ import api.transactions.transactions.conta.ContaRepository;
 import api.transactions.transactions.transacoes.TransactionRepository;
 import api.transactions.transactions.transacoes.entity.Transacoes;
 import api.transactions.transactions.transacoes.model.DataTransacaoDTO;
+import api.transactions.transactions.transacoes.model.DetalhesTransacaoDTO;
 import api.transactions.transactions.transacoes.model.TransacaoDTO;
 import api.transactions.transactions.usuario.UserRepository;
 import api.transactions.transactions.usuario.model.DadosListagemUsuarios;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,7 +33,7 @@ public class TransactionsController {
 
     @PostMapping
     @Transactional
-    public void transaction(@RequestBody @Valid TransacaoDTO dados) throws Exception {
+    public ResponseEntity<DetalhesTransacaoDTO> transaction(@RequestBody @Valid TransacaoDTO dados, UriComponentsBuilder urlBuilder) throws Exception {
         if(!dados.usuarioPagador().equals(dados.usuarioReceptor())){
             var buscaPagador = repository.getReferenceByUsername(dados.usuarioPagador());
             var buscaReceptor = repository.getReferenceByUsername(dados.usuarioReceptor());
@@ -53,15 +56,24 @@ public class TransactionsController {
             contaPagadora.atualizaBalance((-1 * dados.valor()));
             contaReceptora.atualizaBalance(dados.valor());
 
-            transactionrepository.save(new Transacoes(dados, contaPagadora, contaReceptora));
+            var novaTransacao = transactionrepository.save(new Transacoes(dados, contaPagadora, contaReceptora));
+            var url = urlBuilder.path("/transactions/info/{id}").buildAndExpand(novaTransacao.getId()).toUri();
+
+            return ResponseEntity.created(url).body(new DetalhesTransacaoDTO(novaTransacao));
 
         } else{
             throw new Exception("Transação Invalida, Impossível transferir para si mesmo");
         }
     }
 
+    @GetMapping("/info/{id}")
+    public ResponseEntity<DetalhesTransacaoDTO> getTransactionsByIdTransaction(@PathVariable Long id){
+        var transacao = transactionrepository.getReferenceById(id);
+        return ResponseEntity.ok(new DetalhesTransacaoDTO(transacao));
+    }
+
     @GetMapping("/{id}")
-    public List<TransacaoDTO> getTransactionsById(@PathVariable Long id){
+    public ResponseEntity<List<TransacaoDTO>> getTransactionsById(@PathVariable Long id){
         var transacoesDebitadas = transactionrepository.getReferenceByDebitedAccountId(id);
         var transacoesCreditadas = transactionrepository.getReferenceByCreditedAccountId(id);
 
@@ -71,11 +83,11 @@ public class TransactionsController {
         ArrayList<TransacaoDTO> todas = new ArrayList<TransacaoDTO>(creditadas);
         todas.addAll(debitadas);
 
-        return todas;
+        return ResponseEntity.ok(todas);
     }
 
     @GetMapping
-    public List<TransacaoDTO> getTransactionsByDate(@RequestBody @Valid DataTransacaoDTO data){
+    public ResponseEntity<List<TransacaoDTO>> getTransactionsByDate(@RequestBody @Valid DataTransacaoDTO data){
         //DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         String dataBuscada = data.dataBuscada();//format.format(data.dataBuscada());
         var transacoesCreditadasDaData = transactionrepository.findAllByCreatedAtAndCreditedAccountId(dataBuscada, data.id());
@@ -87,24 +99,24 @@ public class TransactionsController {
         ArrayList<TransacaoDTO> todas = new ArrayList<TransacaoDTO>(creditadas);
         todas.addAll(debitadas);
 
-        return todas;
+        return ResponseEntity.ok(todas);
     }
 
     @GetMapping("credited/{id}")
-    public List<TransacaoDTO> getCreditedTransactionsById(@PathVariable Long id){
+    public ResponseEntity<List<TransacaoDTO>> getCreditedTransactionsById(@PathVariable Long id){
         var creditadas = transactionrepository.getReferenceByCreditedAccountId(id);
 
         List<TransacaoDTO> creditadasFormatada = creditadas.stream().map(TransacaoDTO::new).toList();
 
-        return creditadasFormatada;
+        return ResponseEntity.ok(creditadasFormatada);
     }
 
     @GetMapping("debited/{id}")
-    public List<TransacaoDTO> getDebitedTransactionsById(@PathVariable Long id){
+    public ResponseEntity<List<TransacaoDTO>> getDebitedTransactionsById(@PathVariable Long id){
         var debitadas = transactionrepository.getReferenceByDebitedAccountId(id);
 
         List<TransacaoDTO> debitadasFormatada = debitadas.stream().map(TransacaoDTO::new).toList();
 
-        return debitadasFormatada;
+        return ResponseEntity.ok(debitadasFormatada);
     }
 }

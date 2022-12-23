@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import med.voll.api.endereco.DadosEndereco;
 import med.voll.api.endereco.Endereco;
 
 @Table(name = "tb_pacientes")
@@ -38,5 +39,19 @@ public class Paciente {
         this.cpf = dados.cpf();
 
         this.endereco = new Endereco(dados.endereco());
+    }
+
+    public void atualizaInformacoes(DadosAtualizaPaciente paciente) {
+        if(paciente.nome() != null){
+            this.nome = paciente.nome();
+        }
+        if(paciente.email() != null){
+            this.email = paciente.email();
+        }
+        if(paciente.telefone() != null){
+            this.telefone = paciente.telefone();
+        } if (paciente.endereco() != null) {
+            this.endereco.atualizarInformacoes(paciente.endereco());
+        }
     }
 }
