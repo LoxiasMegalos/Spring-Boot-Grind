@@ -3,7 +3,7 @@ package med.voll.api.domain.paciente.controller;
 
 import jakarta.validation.Valid;
 import med.voll.api.domain.paciente.*;
-import med.voll.api.infra.TratadorDeErros;
+import med.voll.api.infra.exception.TratadorDeErros;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
